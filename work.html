@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Works Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* ======================================================= */
+        /* === 1. CSS VARIABLES & BASE STYLES (Approx. 50 lines) === */
+        /* ======================================================= */
+        :root {
+            --primary-color: #ff5722; /* Orange/Accent Color */
+            --secondary-color: #333;
+            --text-color: #1a1a1a;
+            --bg-color: #f4f7f6;
+            --card-bg: #fff;
+            --shadow-subtle: 0 4px 10px rgba(0, 0, 0, 0.05);
+            --shadow-strong: 0 12px 25px rgba(255, 87, 34, 0.2);
+            --transition-speed: 0.3s;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 25px;
+        }
+
+        /* ======================================================= */
+        /* === 2. HEADER & FILTER SECTION (Approx. 70 lines) ===== */
+        /* ======================================================= */
+        
+        .works-section {
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .works-header {
+            margin-bottom: 50px;
+        }
+
+        .works-header h2 {
+            font-size: 3.5em;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+        }
+        
+        .works-header p {
+            font-size: 1.1em;
+            color: var(--secondary-color);
+            opacity: 0.7;
+        }
+
+        .filter-buttons {
+            margin-bottom: 40px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .filter-btn {
+            background-color: var(--card-bg);
+            color: var(--secondary-color);
+            border: 1px solid #ddd;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all var(--transition-speed) ease;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .filter-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 6px 15px rgba(255, 87, 34, 0.4);
+        }
+
+        /* ======================================================= */
+        /* === 3. WORKS GRID & CARD STYLES (Approx. 100 lines) === */
+        /* ======================================================= */
+        
+        .works-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            transition: all 0.5s ease;
+        }
+
+        .work-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: var(--shadow-subtle);
+            text-align: left;
+            transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, opacity var(--transition-speed) ease;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        /* Filter Hide/Show Animation */
+        .work-card.hidden {
+            display: none;
+            opacity: 0;
+            transform: scale(0.8);
+        }
+
+        .work-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-strong);
+        }
+        
+        .work-card-image {
+            width: 100%;
+            height: 220px;
+            overflow: hidden;
+        }
+
+        .work-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 5s ease;
+        }
+
+        .work-card:hover .work-card-image img {
+            transform: scale(1.1); /* Subtle zoom on hover */
+        }
+
+        .work-card-info {
+            padding: 25px;
+        }
+
+        .work-card-category {
+            display: inline-block;
+            background-color: #f3f3f3;
+            color: var(--primary-color);
+            font-size: 0.8em;
+            font-weight: 700;
+            padding: 5px 10px;
+            border-radius: 50px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .work-card-info h3 {
+            font-size: 1.5em;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .work-card-info .view-link {
+            color: var(--primary-color);
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .work-card-info .view-link i {
+            margin-left: 8px;
+            transition: margin-left 0.2s;
+        }
+        
+        .work-card:hover .view-link i {
+            margin-left: 12px;
+        }
+        
+        /* ======================================================= */
+        /* === 4. MODAL/POPUP STYLING (Approx. 120 lines) ======== */
+        /* ======================================================= */
+        
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            padding-top: 50px;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 900px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            animation: fadeInModal 0.4s ease-out;
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-image-container {
+            width: 100%;
+            height: 350px;
+            overflow: hidden;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        .modal-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .modal-details {
+            padding: 30px;
+            overflow-y: auto; /* Scrollable details */
+        }
+        
+        .modal-details h3 {
+            font-size: 2.2em;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .modal-details p {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+        }
+        
+        .modal-details .tech-stack {
+            margin-top: 20px;
+        }
+
+        .modal-details .tech-stack span {
+            display: inline-block;
+            background-color: var(--bg-color);
+            color: var(--secondary-color);
+            padding: 5px 12px;
+            border-radius: 5px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        
+        .modal-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: right;
+        }
+
+        .modal-footer a {
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: background-color var(--transition-speed);
+        }
+
+        .modal-footer a:hover {
+            background-color: #e64a19;
+        }
+
+        /* The Close Button */
+        .close-btn {
+            color: white;
+            position: absolute;
+            top: 15px;
+            right: 25px;
+            font-size: 40px;
+            font-weight: bold;
+            transition: color var(--transition-speed);
+            cursor: pointer;
+            z-index: 1001;
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .close-btn:hover {
+            color: var(--primary-color);
+        }
+
+        /* ======================================================= */
+        /* === 5. RESPONSIVENESS (Approx. 30 lines) ============== */
+        /* ======================================================= */
+        
+        @media (max-width: 1024px) {
+            .works-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .works-section {
+                padding: 40px 0;
+            }
+            .works-header h2 {
+                font-size: 2.5em;
+            }
+            .works-grid {
+                gap: 20px;
+            }
+            .work-card-image {
+                height: 200px;
+            }
+            .modal-content {
+                margin: 10% auto;
+                max-height: 85vh;
+            }
+            .modal-image-container {
+                height: 200px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .works-grid {
+                grid-template-columns: 1fr;
+            }
+            .filter-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .filter-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <section class="works-section" id="works">
+        <div class="container">
+            <div class="works-header">
+                <h2>Featured Projects</h2>
+                <p>A showcase of my diverse design and development expertise. Click on any card to view the case study.</p>
+            </div>
+
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all" onclick="filterWorks('all')">All Works</button>
+                <button class="filter-btn" data-filter="web-dev" onclick="filterWorks('web-dev')">Web Development</button>
+                <button class="filter-btn" data-filter="ui-ux" onclick="filterWorks('ui-ux')">UI/UX Design</button>
+                <button class="filter-btn" data-filter="branding" onclick="filterWorks('branding')">Branding</button>
+                <button class="filter-btn" data-filter="mobile" onclick="filterWorks('mobile')">Mobile Apps</button>
+            </div>
+
+            <div class="works-grid" id="worksGrid">
+                
+                <div class="work-card" data-category="web-dev ui-ux" onclick="openModal('project1')">
+                    <div class="work-card-image">
+                        <img src="https://picsum.photos/400/300?random=1" alt="E-Commerce Redesign">
+                    </div>
+                    <div class="work-card-info">
+                        <span class="work-card-category">Web Dev / UI/UX</span>
+                        <h3>Blink Commerce Platform</h3>
+                        <span class="view-link">View Case Study <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </div>
+                
+                <div class="work-card" data-category="mobile ui-ux" onclick="openModal('project2')">
+                    <div class="work-card-image">
+                        <img src="https://picsum.photos/400/300?random=2" alt="Financial Mobile App">
+                    </div>
+                    <div class="work-card-info">
+                        <span class="work-card-category">Mobile / UI/UX</span>
+                        <h3>Finance Tracker App</h3>
+                        <span class="view-link">View Case Study <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </div>
+                
+                <div class="work-card" data-category="branding" onclick="openModal('project3')">
+                    <div class="work-card-image">
+                        <img src="https://picsum.photos/400/300?random=3" alt="Corporate Branding">
+                    </div>
+                    <div class="work-card-info">
+                        <span class="work-card-category">Branding</span>
+                        <h3>Global Solutions Identity</h3>
+                        <span class="view-link">View Case Study <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </div>
+                
+                <div class="work-card" data-category="web-dev" onclick="openModal('project4')">
+                    <div class="work-card-image">
+                        <img src="https://picsum.photos/400/300?random=4" alt="Personal Portfolio Site">
+                    </div>
+                    <div class="work-card-info">
+                        <span class="work-card-category">Web Development</span>
+                        <h3>Developer Portfolio Site</h3>
+                        <span class="view-link">View Case Study <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </div>
+                
+                <div class="work-card" data-category="mobile ui-ux" onclick="openModal('project5')">
+                    <div class="work-card-image">
+                        <img src="https://picsum.photos/400/300?random=5" alt="Health & Fitness App">
+                    </div>
+                    <div class="work-card-info">
+                        <span class="work-card-category">Mobile / UI/UX</span>
+                        <h3>FitPulse Health App</h3>
+                        <span class="view-link">View Case Study <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </div>
+                
+                <div class="work-card" data-category="ui-ux" onclick="openModal('project6')">
+                    <div class="work-card-image">
+                        <img src="https://picsum.photos/400/300?random=6" alt="SaaS Dashboard Design">
+                    </div>
+                    <div class="work-card-info">
+                        <span class="work-card-category">UI/UX Design</span>
+                        <h3>SaaS Analytics Dashboard</h3>
+                        <span class="view-link">View Case Study <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </div>
+                
+            </div>
+            
+        </div>
+    </section>
+
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            
+            <div class="modal-image-container">
+                <img id="modalImage" src="" alt="Project Image">
+            </div>
+            
+            <div class="modal-details">
+                <h3 id="modalTitle"></h3>
+                <p id="modalDescription"></p>
+                
+                <p style="font-weight: 600; color: var(--secondary-color);">Technologies Used:</p>
+                <div class="tech-stack" id="modalTechStack">
+                    </div>
+
+                <div class="modal-footer">
+                    <a id="modalLiveLink" href="#" target="_blank">Visit Live Site <i class="fas fa-external-link-alt"></i></a>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+
+    <script>
+        // =======================================================
+        // === JAVASCRIPT LOGIC (Approx. 100 lines) ==============
+        // =======================================================
+
+        const projectData = {
+            'project1': {
+                title: "Blink Commerce Platform",
+                category: "Web Development, UI/UX Design",
+                description: "A complete redesign and rebuild of a large-scale e-commerce platform. Focused on improving conversion rates through better product discovery and a streamlined checkout process. Implemented a headless architecture using React.",
+                image: "https://picsum.photos/900/400?random=1",
+                tech: ["React", "Node.js", "MongoDB", "Redux", "SCSS"],
+                liveLink: "https://example.com/blink"
+            },
+            'project2': {
+                title: "Finance Tracker App",
+                category: "Mobile, UI/UX Design",
+                description: "Designed and developed a minimalist personal finance management application. Key focus was on clarity, quick transaction logging, and intuitive data visualization for budgeting.",
+                image: "https://picsum.photos/900/400?random=2",
+                tech: ["Flutter", "Dart", "Figma", "Firebase"],
+                liveLink: "https://example.com/finance"
+            },
+            'project3': {
+                title: "Global Solutions Identity",
+                category: "Branding",
+                description: "Developed a comprehensive brand identity system, including logo design, color palette, typography, and guidelines for all corporate communications, ensuring a modern and trustworthy image.",
+                image: "https://picsum.photos/900/400?random=3",
+                tech: ["Adobe Illustrator", "Figma", "Brand Strategy"],
+                liveLink: "https://example.com/global-brand"
+            },
+            'project4': {
+                title: "Developer Portfolio Site",
+                category: "Web Development",
+                description: "My personal portfolio site, built from scratch to demonstrate proficiency in modern frontend development and clean, semantic code structure. Optimized for speed and responsiveness.",
+                image: "https://picsum.photos/900/400?random=4",
+                tech: ["HTML5", "CSS3 Grid", "Vanilla JS", "GSAP (Animation)"],
+                liveLink: "https://example.com/portfolio-live"
+            },
+            'project5': {
+                title: "FitPulse Health App",
+                category: "Mobile, UI/UX Design",
+                description: "A health and fitness application focusing on workout tracking and meal planning. The design emphasizes motivational elements and gamification to improve user retention.",
+                image: "https://picsum.photos/900/400?random=5",
+                tech: ["SwiftUI", "Sketch", "HealthKit API", "UX Testing"],
+                liveLink: "https://example.com/fitpulse"
+            },
+            'project6': {
+                title: "SaaS Analytics Dashboard",
+                category: "UI/UX Design",
+                description: "Designed a complex B2B analytics dashboard, simplifying massive datasets into easily digestible charts and KPIs. The focus was on information hierarchy and customization.",
+                image: "https://picsum.photos/900/400?random=6",
+                tech: ["Figma", "Data Visualization", "User Flows"],
+                liveLink: "https://example.com/dashboard"
+            }
+        };
+
+        const worksGrid = document.getElementById('worksGrid');
+        const allCards = document.querySelectorAll('.work-card');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const modal = document.getElementById("projectModal");
+
+        // 1. Filtering Logic
+        function filterWorks(category) {
+            
+            // Update active button state
+            filterBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-filter') === category) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Handle card visibility
+            allCards.forEach(card => {
+                const cardCategories = card.getAttribute('data-category');
+                
+                // Hide card first for transition effect
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.9)';
+                
+                setTimeout(() => {
+                    // Check if card should be hidden or shown
+                    if (category === 'all' || cardCategories.includes(category)) {
+                        card.style.display = 'block';
+                        // Use requestAnimationFrame for smooth re-display transition
+                        requestAnimationFrame(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'scale(1)';
+                        });
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }, 300); // Wait for fade-out before changing display property
+            });
+        }
+        
+        // 2. Modal Logic
+        function openModal(projectId) {
+            const data = projectData[projectId];
+            if (!data) return;
+
+            document.getElementById("modalTitle").textContent = data.title;
+            document.getElementById("modalDescription").textContent = data.description;
+            document.getElementById("modalImage").src = data.image;
+            document.getElementById("modalLiveLink").href = data.liveLink;
+            
+            const techStackContainer = document.getElementById("modalTechStack");
+            techStackContainer.innerHTML = '';
+            
+            data.tech.forEach(tech => {
+                const span = document.createElement('span');
+                span.textContent = tech;
+                techStackContainer.appendChild(span);
+            });
+            
+            modal.style.display = "block";
+            document.body.style.overflow = 'hidden'; // Disable background scrolling
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+            document.body.style.overflow = 'auto'; // Enable background scrolling
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+        
+        // Initialize filtering on load
+        document.addEventListener('DOMContentLoaded', () => {
+             // Ensure initial "All Works" filter is applied
+             filterWorks('all'); 
+        });
+
+    </script>
+</body>
+</html>

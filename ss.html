@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Services</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* ======================================================= */
+        /* === 1. CSS VARIABLES & BASE STYLES (Approx. 50 lines) === */
+        /* ======================================================= */
+        
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --card-bg: #fff;
+            --border-color: #eee;
+            --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.05);
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --hover-shadow: 0 8px 30px rgba(0, 123, 255, 0.2);
+        }
+
+        /* Dark Mode Variables */
+        [data-theme='dark'] {
+            --text-color: #f8f9fa;
+            --bg-color: #1a1a1a;
+            --card-bg: #2b2b2b;
+            --border-color: #444;
+            --shadow-light: 0 4px 15px rgba(255, 255, 255, 0.1);
+            --hover-shadow: 0 8px 30px rgba(0, 123, 255, 0.4);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            line-height: 1.6;
+            transition: background-color 0.5s, color 0.5s;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        h2, h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        /* ======================================================= */
+        /* === 2. SERVICES SECTION STYLING (Approx. 100 lines) === */
+        /* ======================================================= */
+        
+        .services-section {
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .services-header {
+            margin-bottom: 60px;
+        }
+
+        .services-header h2 {
+            font-size: 3em;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .services-header h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+        }
+
+        .services-header p {
+            font-size: 1.2em;
+            color: var(--secondary-color);
+            max-width: 700px;
+            margin: 20px auto 0;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .service-card {
+            background-color: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--border-color);
+            text-align: left;
+            transition: transform 0.4s ease-out, box-shadow 0.4s, background-color 0.4s;
+            transform: translateY(20px); /* Initial state for animation */
+            opacity: 0; /* Initial state for animation */
+        }
+
+        /* Animation class added by JS */
+        .service-card.animate-in {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .service-icon {
+            font-size: 3em;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 123, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .service-card h3 {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-color); /* Overriding base h3 color */
+        }
+
+        .service-card p {
+            color: var(--secondary-color);
+            font-size: 1em;
+            margin-bottom: 25px;
+        }
+        
+        .service-card a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 2px;
+            transition: color 0.3s, border-color 0.3s;
+            cursor: pointer;
+        }
+
+        .service-card a:hover {
+            color: #0056b3;
+            border-color: #0056b3;
+        }
+        
+        /* ======================================================= */
+        /* === 3. DARK MODE TOGGLE (Approx. 30 lines) ============ */
+        /* ======================================================= */
+
+        .dark-mode-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 50px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-light);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .dark-mode-toggle i {
+            font-size: 1.5em;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        [data-theme='dark'] .dark-mode-toggle i.fa-sun {
+            color: var(--primary-color);
+        }
+        [data-theme='light'] .dark-mode-toggle i.fa-moon {
+            color: var(--primary-color);
+        }
+
+        /* ======================================================= */
+        /* === 4. MODAL/POPUP STYLING (Approx. 120 lines) ======== */
+        /* ======================================================= */
+        
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 200;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7); /* Black w/ opacity */
+            backdrop-filter: blur(5px);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: fadeInModal 0.4s ease-out;
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-content h3 {
+            font-size: 2.2em;
+            margin-bottom: 20px;
+        }
+
+        .modal-content ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .modal-content ul li {
+            background-color: var(--bg-color);
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+            font-size: 0.95em;
+            color: var(--text-color);
+        }
+
+        .modal-content .modal-footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: right;
+        }
+
+        .modal-content .modal-footer button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .modal-content .modal-footer button:hover {
+            background-color: #0056b3;
+        }
+
+        /* The Close Button */
+        .close-btn {
+            color: var(--secondary-color);
+            float: right;
+            font-size: 35px;
+            font-weight: bold;
+            transition: color 0.3s;
+            position: absolute;
+            top: 15px;
+            right: 25px;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: var(--primary-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* ======================================================= */
+        /* === 5. RESPONSIVENESS (Approx. 20 lines) ============== */
+        /* ======================================================= */
+        
+        @media (max-width: 768px) {
+            .services-header h2 {
+                font-size: 2.5em;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .service-card {
+                padding: 30px 20px;
+                text-align: center;
+            }
+            
+            .service-icon {
+                margin: 0 auto 20px auto;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 20% auto;
+            }
+            
+            .modal-content ul {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body data-theme="light">
+    
+    <div class="dark-mode-toggle" onclick="toggleDarkMode()">
+        <i class="fas fa-sun"></i> <i class="fas fa-moon" style="display: none;"></i> </div>
+    
+    <section class="services-section" id="services">
+        <div class="container">
+            <div class="services-header">
+                <h2>Our Core Services</h2>
+                <p>We provide comprehensive solutions across design, development, and strategy to help your business achieve digital excellence.</p>
+            </div>
+
+            <div class="services-grid">
+                
+                <div class="service-card" data-service-id="web-dev">
+                    <div class="service-icon"><i class="fas fa-code"></i></div>
+                    <h3>Web Development</h3>
+                    <p>Building high-performance, scalable, and secure web applications tailored to your business needs using modern frameworks.</p>
+                    <a class="learn-more-btn" onclick="openModal('web-dev')">Learn More →</a>
+                </div>
+                
+                <div class="service-card" data-service-id="ui-ux">
+                    <div class="service-icon"><i class="fas fa-palette"></i></div>
+                    <h3>UI/UX Design</h3>
+                    <p>Creating intuitive, engaging, and accessible user interfaces that drive satisfaction and convert visitors into loyal customers.</p>
+                    <a class="learn-more-btn" onclick="openModal('ui-ux')">Learn More →</a>
+                </div>
+                
+                <div class="service-card" data-service-id="strategy">
+                    <div class="service-icon"><i class="fas fa-chart-line"></i></div>
+                    <h3>Digital Strategy</h3>
+                    <p>Formulating a powerful digital roadmap, including SEO optimization, content planning, and market analysis for growth.</p>
+                    <a class="learn-more-btn" onclick="openModal('strategy')">Learn More →</a>
+                </div>
+                
+            </div>
+            
+        </div>
+    </section>
+
+    <div id="serviceModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle"></h3>
+            <p id="modalDescription"></p>
+            
+            <p style="font-weight: 600; margin-top: 20px; color: var(--primary-color);">Key Areas Covered:</p>
+            <ul id="modalFeatures">
+                </ul>
+            
+            <div class="modal-footer">
+                <button onclick="closeModal()">Got It!</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // =======================================================
+        // === JAVASCRIPT LOGIC (Approx. 100 lines) ==============
+        // =======================================================
+
+        const modal = document.getElementById("serviceModal");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalDescription = document.getElementById("modalDescription");
+        const modalFeatures = document.getElementById("modalFeatures");
+
+        // Service data for the modals
+        const serviceData = {
+            'web-dev': {
+                title: "Advanced Web Development",
+                description: "We build modern, responsive, and blazing-fast websites and web applications using technologies like React, Vue, Node.js, and robust headless CMS solutions.",
+                features: ["Frontend Development (React/Vue)", "Backend APIs (Node/Python)", "Database Integration (SQL/NoSQL)", "Cloud Deployment & Hosting", "Performance Optimization"]
+            },
+            'ui-ux': {
+                title: "User-Centric UI/UX Design",
+                description: "Our design process starts with deep user research. We focus on creating effortless user flows, detailed wireframes, prototypes, and high-fidelity visual design systems.",
+                features: ["User Research & Persona Mapping", "Wireframing & Prototyping", "Design System Creation (Figma)", "Accessibility (WCAG) Compliance", "Usability Testing"]
+            },
+            'strategy': {
+                title: "Data-Driven Digital Strategy",
+                description: "Maximize your ROI with a focused digital strategy. We analyze your market, define your audience, and plan your content and SEO roadmap for sustainable organic growth.",
+                features: ["SEO & SEM Planning", "Content Strategy & Copywriting", "Competitor Analysis", "Digital Marketing Roadmap", "Performance Metrics Tracking"]
+            }
+        };
+
+        function openModal(serviceId) {
+            const data = serviceData[serviceId];
+            if (data) {
+                modalTitle.textContent = data.title;
+                modalDescription.textContent = data.description;
+                
+                // Clear previous features
+                modalFeatures.innerHTML = ''; 
+                
+                // Add new features
+                data.features.forEach(feature => {
+                    const li = document.createElement('li');
+                    li.textContent = feature;
+                    modalFeatures.appendChild(li);
+                });
+                
+                modal.style.display = "block";
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            }
+        }
+
+        function closeModal() {
+            modal.style.display = "none";
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        // --- Dark Mode Toggle ---
+        function toggleDarkMode() {
+            const body = document.body;
+            const toggle = document.querySelector('.dark-mode-toggle');
+            const sunIcon = toggle.querySelector('.fa-sun');
+            const moonIcon = toggle.querySelector('.fa-moon');
+            
+            if (body.getAttribute('data-theme') === 'dark') {
+                body.setAttribute('data-theme', 'light');
+                sunIcon.style.display = 'inline';
+                moonIcon.style.display = 'none';
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'inline';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Apply theme on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+            const toggle = document.querySelector('.dark-mode-toggle');
+            const sunIcon = toggle.querySelector('.fa-sun');
+            const moonIcon = toggle.querySelector('.fa-moon');
+            
+            if (savedTheme === 'dark') {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'inline';
+            } else {
+                sunIcon.style.display = 'inline';
+                moonIcon.style.display = 'none';
+            }
+            
+            // --- Intersection Observer (On-Scroll Animation) ---
+            const serviceCards = document.querySelectorAll('.service-card');
+            
+            const observerOptions = {
+                root: null, // viewport
+                rootMargin: '0px',
+                threshold: 0.2 // Trigger when 20% of the item is visible
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate-in');
+                        // Stop observing once animated
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+
+            serviceCards.forEach(card => {
+                observer.observe(card);
+            });
+        });
+
+    </script>
+</body>
+</html>

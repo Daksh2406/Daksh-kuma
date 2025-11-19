@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Notes App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        /* ======================================================= */
+        /* === 1. CSS VARIABLES & BASE STYLES (Approx. 60 lines) === */
+        /* ======================================================= */
+        
+        :root {
+            --primary-color: #2ecc71; /* Green/Accent Color */
+            --secondary-color: #34495e;
+            --text-color: #333;
+            --bg-color: #ecf0f1;
+            --card-bg: #fff;
+            --input-bg: #f4f6f7;
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --shadow-focus: 0 0 0 4px rgba(46, 204, 113, 0.4);
+            --transition-speed: 0.3s;
+            --font-main: 'Arial', sans-serif;
+            --delete-color: #e74c3c;
+        }
+
+        /* Dark Mode Variables */
+        [data-theme='dark'] {
+            --text-color: #ecf0f1;
+            --bg-color: #2c3e50;
+            --card-bg: #34495e;
+            --input-bg: #44617a;
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.4);
+            --shadow-focus: 0 0 0 4px rgba(46, 204, 113, 0.6);
+            --secondary-color: #bdc3c7;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            transition: background-color 0.5s, color 0.5s; /* Smooth theme transition */
+        }
+
+        .notes-app {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 25px;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-subtle);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: var(--secondary-color);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        /* Dark Mode H1 override */
+        [data-theme='dark'] h1 {
+            color: var(--secondary-color);
+        }
+
+        /* ======================================================= */
+        /* === 2. INPUT & SEARCH SECTION (Approx. 90 lines) ====== */
+        /* ======================================================= */
+        
+        .notes-controls {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .search-container {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 12px 15px 12px 40px; 
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text-color); /* Essential for dark mode */
+            font-size: 1em;
+            transition: border-color var(--transition-speed);
+        }
+
+        #searchInput:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: var(--shadow-focus);
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+            opacity: 0.6;
+        }
+        
+        .add-note-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: background-color var(--transition-speed), transform var(--transition-speed);
+        }
+
+        .add-note-btn:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+        
+        /* Theme Toggle Button */
+        .theme-toggle-btn {
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            z-index: 1001; 
+            background: var(--card-bg); 
+            border: 1px solid var(--secondary-color); 
+            padding: 10px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            color: var(--secondary-color);
+            transition: all 0.3s;
+            box-shadow: var(--shadow-subtle);
+        }
+        
+        .theme-toggle-btn:hover {
+            color: var(--primary-color);
+        }
+
+
+        /* ======================================================= */
+        /* === 3. MODAL (New Note/Edit) STYLING (Approx. 110 lines) */
+        /* ======================================================= */
+        
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideDown 0.4s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-content h2 {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        #noteTitle, #noteContent {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 1em;
+            transition: border-color var(--transition-speed);
+        }
+
+        #noteTitle:focus, #noteContent:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: var(--shadow-focus);
+        }
+
+        #noteContent {
+            resize: vertical;
+            min-height: 150px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .save-btn, .cancel-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity var(--transition-speed);
+        }
+        
+        .save-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .save-btn:hover {
+            opacity: 0.9;
+        }
+
+        .cancel-btn {
+            background-color: #bdc3c7;
+            color: var(--secondary-color);
+        }
+
+        /* The Close Button */
+        .close-btn {
+            color: #aaa;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            color: var(--delete-color);
+        }
+        
+        /* ======================================================= */
+        /* === 4. NOTES LIST STYLING (Approx. 120 lines) ========= */
+        /* ======================================================= */
+        
+        #notesList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        
+        /* Dark Mode Border Override */
+        [data-theme='dark'] #notesList {
+            border-top: 1px solid #555;
+        }
+        
+        .note-card {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-subtle);
+            border-left: 5px solid var(--primary-color);
+            position: relative;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .note-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .note-card h3 {
+            font-size: 1.4em;
+            color: var(--secondary-color);
+            margin-bottom: 10px;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 5px;
+            word-wrap: break-word;
+        }
+        
+        /* Dark Mode H3 and border override */
+        [data-theme='dark'] .note-card h3 {
+            border-bottom: 1px dashed #444;
+            color: var(--secondary-color);
+        }
+        
+        .note-card p {
+            color: var(--text-color);
+            font-size: 0.95em;
+            display: -webkit-box;
+            
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 15px;
+        }
+
+        .note-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 10px;
+            border-top: 1px solid var(--input-bg);
+        }
+        
+        [data-theme='dark'] .note-footer {
+            border-top: 1px solid #555;
+        }
+
+
+        .note-timestamp {
+            font-size: 0.8em;
+            color: var(--secondary-color);
+            opacity: 0.7;
+        }
+
+        .note-actions button {
+            background: none;
+            border: none;
+            color: var(--secondary-color);
+            cursor: pointer;
+            font-size: 1em;
+            margin-left: 10px;
+            transition: color var(--transition-speed);
+        }
+        
+        .note-actions .edit-btn:hover {
+            color: var(--primary-color);
+        }
+        
+        .note-actions .delete-btn:hover {
+            color: var(--delete-color);
+        }
+        
+        /* No Notes Message */
+        #noNotesMessage {
+            grid-column: 1 / -1; 
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--secondary-color);
+            opacity: 0.6;
+            margin-top: 50px;
+        }
+
+        /* ======================================================= */
+        /* === 5. RESPONSIVENESS (Approx. 20 lines) ============== */
+        /* ======================================================= */
+        
+        @media (max-width: 768px) {
+            .notes-app {
+                margin: 20px 10px;
+                padding: 15px;
+            }
+            .notes-controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .add-note-btn {
+                width: 100%;
+            }
+            #notesList {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                margin: 20% auto;
+            }
+        }
+
+    </style>
+</head>
+<body data-theme="light">
+    
+    <button id="themeToggle" class="theme-toggle-btn" title="Toggle Dark/Light Mode">
+        <i class="fas fa-moon"></i>
+    </button>
+    
+    <div class="notes-app">
+        <h1><i class="fas fa-clipboard-list"></i> My Personal Notes</h1>
+        
+        <div class="notes-controls">
+            <div class="search-container">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search notes by title or content...">
+            </div>
+            <button class="add-note-btn" id="addNoteBtn">
+                <i class="fas fa-plus"></i> Add New Note
+            </button>
+        </div>
+        
+        <div id="notesList">
+            <div id="noNotesMessage" style="display: none;">You haven't added any notes yet.</div>
+        </div>
+        
+    </div>
+
+    <div id="noteModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitleText">Add New Note</h2>
+            
+            <div class="form-group">
+                <label for="noteTitle">Title</label>
+                <input type="text" id="noteTitle" placeholder="e.g., Meeting Agenda, Shopping List" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="noteContent">Content</label>
+                <textarea id="noteContent" placeholder="Write your thoughts here..." required></textarea>
+            </div>
+            
+            <div class="modal-buttons">
+                <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+                <button class="save-btn" onclick="saveNote()" id="saveNoteBtn">Save Note</button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // =======================================================
+        // === JAVASCRIPT LOGIC (Approx. 200 lines) ==============
+        // =======================================================
+
+        const notesList = document.getElementById('notesList');
+        const searchInput = document.getElementById('searchInput');
+        const addNoteBtn = document.getElementById('addNoteBtn');
+        const modal = document.getElementById('noteModal');
+        const modalTitleText = document.getElementById('modalTitleText');
+        const noteTitleInput = document.getElementById('noteTitle');
+        const noteContentInput = document.getElementById('noteContent');
+        const saveNoteBtn = document.getElementById('saveNoteBtn');
+        const noNotesMessage = document.getElementById('noNotesMessage');
+        const themeToggleBtn = document.getElementById('themeToggle'); // New constant
+
+        let notes = [];
+        let editingId = null; 
+
+        // --- 1. Local Storage Functions ---
+
+        function loadNotes() {
+            const storedNotes = localStorage.getItem('notesApp_data');
+            if (storedNotes) {
+                notes = JSON.parse(storedNotes);
+            }
+            renderNotes();
+        }
+
+        function saveNotes() {
+            localStorage.setItem('notesApp_data', JSON.stringify(notes));
+        }
+        
+        // --- Dark Mode Functions ---
+
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('notesApp_theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            themeToggleBtn.innerHTML = theme === 'dark' 
+                ? '<i class="fas fa-sun"></i>' // Show Sun icon in dark mode
+                : '<i class="fas fa-moon"></i>'; // Show Moon icon in light mode
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('notesApp_theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+            updateThemeIcon(savedTheme);
+        }
+
+
+        // --- 2. Rendering and Display ---
+        
+        function renderNotes(searchTerm = '') {
+            notesList.innerHTML = ''; 
+            const filteredNotes = notes.filter(note => 
+                note.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                note.content.toLowerCase().includes(searchTerm.toLowerCase())
+            ).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+            if (filteredNotes.length === 0) {
+                noNotesMessage.style.display = 'block';
+                noNotesMessage.textContent = searchTerm ? 'No notes found matching your search.' : "You haven't added any notes yet.";
+                return;
+            }
+
+            noNotesMessage.style.display = 'none';
+
+            filteredNotes.forEach(note => {
+                const noteCard = document.createElement('div');
+                noteCard.className = 'note-card';
+                noteCard.setAttribute('data-id', note.id);
+
+                noteCard.innerHTML = `
+                    <h3>${note.title}</h3>
+                    <p>${note.content}</p>
+                    <div class="note-footer">
+                        <span class="note-timestamp">Last updated: ${new Date(note.timestamp).toLocaleDateString()} ${new Date(note.timestamp).toLocaleTimeString()}</span>
+                        <div class="note-actions">
+                            <button class="edit-btn" onclick="openModalForEdit('${note.id}')" title="Edit Note"><i class="fas fa-pen"></i></button>
+                            <button class="delete-btn" onclick="deleteNote('${note.id}')" title="Delete Note"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>
+                `;
+                notesList.appendChild(noteCard);
+            });
+        }
+        
+        // --- 3. Modal Control ---
+
+        function openModal(title = 'Add New Note', note = null) {
+            modalTitleText.textContent = title;
+            noteTitleInput.value = note ? note.title : '';
+            noteContentInput.value = note ? note.content : '';
+            editingId = note ? note.id : null;
+
+            modal.style.display = "block";
+            document.body.style.overflow = 'hidden'; 
+            noteTitleInput.focus();
+        }
+
+        window.closeModal = function() { // Make global
+            modal.style.display = "none";
+            document.body.style.overflow = 'auto';
+            noteTitleInput.value = '';
+            noteContentInput.value = '';
+            editingId = null;
+        }
+
+        window.openModalForEdit = function(id) { // Make global
+            const noteToEdit = notes.find(n => n.id === id);
+            if (noteToEdit) {
+                openModal('Edit Note', noteToEdit);
+            }
+        }
+        
+        // --- 4. CRUD Operations ---
+
+        window.saveNote = function() { // Make global
+            const title = noteTitleInput.value.trim();
+            const content = noteContentInput.value.trim();
+            
+            if (!title || !content) {
+                alert('Title and content cannot be empty.');
+                return;
+            }
+
+            const now = new Date().toISOString();
+
+            if (editingId) {
+                const index = notes.findIndex(n => n.id === editingId);
+                if (index !== -1) {
+                    notes[index].title = title;
+                    notes[index].content = content;
+                    notes[index].timestamp = now; 
+                }
+            } else {
+                const newNote = {
+                    id: Date.now().toString(), 
+                    title,
+                    content,
+                    timestamp: now
+                };
+                notes.push(newNote);
+            }
+
+            saveNotes();
+            renderNotes(searchInput.value);
+            closeModal();
+        }
+
+        window.deleteNote = function(id) { // Make global
+            if (confirm('Are you sure you want to delete this note?')) {
+                notes = notes.filter(n => n.id !== id);
+                saveNotes();
+                renderNotes(searchInput.value);
+            }
+        }
+
+        // --- 5. Event Listeners ---
+
+        addNoteBtn.addEventListener('click', () => openModal());
+        
+        searchInput.addEventListener('input', (e) => {
+            renderNotes(e.target.value);
+        });
+        
+        themeToggleBtn.addEventListener('click', toggleTheme); // Dark Mode Toggle Listener
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Initialize the app (Load theme first, then load notes)
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTheme();
+            loadNotes();
+        });
+
+    </script>
+</body>
+</html>

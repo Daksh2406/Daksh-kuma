@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EXPERIENCE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
+    <style>
+        :root {
+            --light-grey-bg: #f5f5f5; /* Background for testimonials/active experience */
+            --accent-blue: #007bff; /* Highlight color for dot/buttons */
+            --primary-text: #333; /* Main text color/Footer background */
+            --accent-red: #e74c3c; /* Button color in footer CTA */
+        }
+        
+        /* --- New/Modified Experience CSS --- */
+
+        /* Base container (existing styles are fine) */
+        .experience-section {
+            padding: 80px 5%;
+            background-color: white;
+        }
+
+        .timeline-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        /* Timeline Item Styling */
+        .timeline-item {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 30px; 
+            position: relative;
+            cursor: pointer; /* Interaction hint */
+            opacity: 0.5; /* Dim non-active items */
+            transition: opacity 0.3s, background-color 0.3s;
+        }
+
+        .timeline-item:hover {
+            opacity: 0.8;
+        }
+
+        /* Active State for Interaction */
+        .timeline-item.active {
+            opacity: 1; /* Highlight active item */
+            background-color: var(--light-grey-bg); /* Light background for focus */
+            padding: 15px 10px 30px 10px;
+            margin: 0 -10px; /* Expand slightly on activation */
+            border-radius: 8px;
+        }
+
+        /* Timeline Dot Styling */
+        .timeline-dot {
+            width: 15px;
+            height: 15px;
+            background-color: #ddd; /* Default color */
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #ddd;
+            z-index: 10;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+
+        /* Active Dot Highlight */
+        .timeline-item.active .timeline-dot {
+            background-color: var(--accent-blue); /* Highlighted color */
+            box-shadow: 0 0 0 2px var(--accent-blue);
+        }
+
+        /* Center line connecting dots */
+        .timeline-center {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .timeline-center .timeline-line {
+            width: 2px;
+            background-color: #ddd;
+            position: absolute;
+            top: 15px; /* Start below the dot */
+            bottom: -5px; /* Extend down to the next dot's level */
+            z-index: 1;
+        }
+        
+        /* Left & Right Content */
+        .timeline-left {
+            flex-basis: 35%;
+            text-align: right;
+            padding-right: 30px;
+        }
+
+        .timeline-right {
+            flex-basis: 60%;
+            padding-left: 30px;
+        }
+
+        /* Role/Title Styling */
+        .timeline-right .role {
+            font-weight: 700;
+            font-size: 1.2em;
+            color: var(--primary-text);
+        }
+
+        /* --- Description Box (Toggleable) --- */
+        .timeline-details {
+            margin-top: -20px; /* Pull up to sit under the timeline item */
+            margin-bottom: 30px;
+            padding: 10px 0 10px 45%; /* Align description with the right content */
+            border-left: 2px solid #ddd;
+            transition: all 0.5s ease-in-out;
+            max-height: 200px; 
+            overflow: hidden;
+            opacity: 1;
+        }
+
+        .timeline-details.hidden {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            opacity: 0;
+        }
+
+        .timeline-details .description {
+            font-size: 1em;
+            padding-left: 20px;
+        }
+
+        /* Responsive Fix for Mobile (to ensure vertical stacking is neat) */
+        @media (max-width: 768px) {
+            .timeline-details {
+                padding: 10px 0 10px 0; /* Full width description */
+                border-left: none; /* Remove vertical line */
+                margin-top: 0; 
+                margin-bottom: 20px;
+            }
+
+            .timeline-details .description {
+                padding-left: 0;
+            }
+            
+            .timeline-item.active {
+                padding: 15px 10px;
+            }
+
+            .timeline-item {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                padding-bottom: 10px;
+            }
+            
+            .timeline-left, .timeline-right {
+                flex-basis: 100%;
+                text-align: center;
+                padding: 0;
+            }
+            .timeline-center {
+                display: none; /* Hide center line/dot on mobile stack */
+            }
+        }
+        /* --- 6. Testimonials Section --- */
+        .testimonials-section {
+            background-color: var(--light-grey-bg); 
+            padding: 80px 5%;
+            text-align: center;
+        }
+
+        .testimonials-section h2 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .testimonials-section .subtitle {
+            max-width: 600px;
+            margin: 0 auto 50px auto;
+        }
+
+        .testimonial-carousel {
+            position: relative;
+            height: 350px; 
+            perspective: 1000px; /* 3D effect depth */
+        }
+
+        .testimonial-card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            position: absolute;
+            width: 60%; 
+            max-width: 700px;
+            height: auto;
+            min-height: 250px;
+            top: 0;
+            left: 50%;
+            transform-origin: 50% 50%;
+            transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth transition */
+        }
+
+        .testimonial-card p {
+            font-style: italic;
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            color: var(--primary-text);
+        }
+
+        .client-name {
+            font-weight: 600;
+            color: var(--primary-text);
+            margin-bottom: 5px;
+        }
+
+        /* Base positions for 3D Carousel */
+        .center-card {
+            z-index: 10;
+            opacity: 1;
+            transform: translateX(-50%) rotateY(0deg);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .left-side {
+            z-index: 5;
+            opacity: 0.3;
+            transform: translateX(-80%) scale(0.85) rotateY(20deg);
+            pointer-events: none;
+        }
+
+        .right-side {
+            z-index: 5;
+            opacity: 0.3;
+            transform: translateX(0%) scale(0.85) rotateY(-20deg);
+            pointer-events: none;
+        }
+
+        .hidden-card {
+            z-index: 1;
+            opacity: 0;
+            transform: translateX(-50%) scale(0.7) rotateY(0deg);
+            pointer-events: none;
+        }
+
+        /* Navigation Buttons Styling */
+        .carousel-navigation {
+            margin-top: 30px;
+        }
+
+        .nav-btn {
+            background: var(--primary-text);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 50%;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent-blue);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .testimonial-carousel {
+                height: auto;
+                min-height: 300px; /* Ensure space for the single visible card */
+            }
+            .testimonial-card {
+                width: 90%;
+                position: absolute; /* Keep absolute for stacking */
+                left: 50%;
+                transform: translateX(-50%) !important;
+                margin-bottom: 20px;
+                transition: opacity 0.5s;
+            }
+            /* Show only the center card on mobile */
+            .left-side, .right-side, .hidden-card {
+                opacity: 0 !important;
+                pointer-events: none;
+            }
+            .center-card {
+                opacity: 1 !important;
+                position: relative;
+                transform: none !important;
+            }
+        }
+        /* --- 7. Footer Section --- */
+        footer {
+            background-color: var(--primary-text); 
+            color: white;
+            padding: 60px 5%;
+        }
+
+        .footer-cta {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 40px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-cta h3 {
+            color: white;
+            font-size: 2.5em;
+            font-weight: 800;
+            max-width: 600px; /* Control line width */
+        }
+
+        /* Added Contact Button in CTA */
+        .contact-footer-btn {
+            background-color: var(--accent-red);
+            color: white;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+            flex-shrink: 0;
+        }
+
+        .contact-footer-btn:hover {
+            background-color: #c0392b; /* Darker red on hover */
+        }
+
+        .footer-info {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .info-block {
+            min-width: 200px;
+            flex-grow: 1;
+        }
+
+        .info-block h4 {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-block p, .info-block a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .info-block a:hover {
+            color: white;
+        }
+
+        /* Footer Responsive Adjustments */
+        @media (max-width: 768px) {
+            .footer-cta {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .footer-cta h3 {
+                font-size: 2em;
+                margin-bottom: 20px;
+            }
+            .contact-footer-btn {
+                width: 100%;
+                text-align: center;
+            }
+            .footer-info {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <section class="experience-section" id="experience">
+    <h2>My Work Experience</h2>
+    <div class="timeline-container">
+        
+        <div class="timeline-item active" onclick="setActiveTimeline(this, 'details-1')">
+            <div class="timeline-left">
+                <p class="company">Self Employed, Brisbane</p>
+                <p class="duration">Sep 2010 - Aug 2014</p>
+            </div>
+            <div class="timeline-center">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div> 
+            </div>
+            <div class="timeline-right">
+                <p class="role">Visual Designer</p>
+            </div>
+        </div>
+        <div class="timeline-details" id="details-1">
+            <p class="description">A visual designer generates posters or patterns, which may include internal and external sites, games, movies, roads and boundaries in cities. Also update the concepts.</p>
+        </div>
+
+        <div class="timeline-item" onclick="setActiveTimeline(this, 'details-2')">
+            <div class="timeline-left">
+                <p class="company">Mam Mam Services</p>
+                <p class="duration">Jun 2015 - Sept 2016</p>
+            </div>
+            <div class="timeline-center">
+                <div class="timeline-dot"></div>
+                <div class="timeline-line"></div>
+            </div>
+            <div class="timeline-right">
+                <p class="role">UI/UX Designer</p>
+            </div>
+        </div>
+        <div class="timeline-details hidden" id="details-2">
+            <p class="description">User Interface design or User Interface engineering is the design of user interfaces for machines and software, such as computers, home appliances, mobile devices.</p>
+        </div>
+
+        <div class="timeline-item" onclick="setActiveTimeline(this, 'details-3')">
+            <div class="timeline-left">
+                <p class="company">Global Solution</p>
+                <p class="duration">Oct 2016 - June 2020</p>
+            </div>
+            <div class="timeline-center">
+                <div class="timeline-dot"></div>
+                </div>
+            <div class="timeline-right">
+                <p class="role">Sr. Frontend Designer</p>
+            </div>
+        </div>
+        <div class="timeline-details hidden" id="details-3">
+            <p class="description">Design tools encompass tools, Large selection, Awesome. Cheap Prices. Full Offer, Same Goods. Compare Online. Simple Search. The Best Price. Compare Simple.</p>
+        </div>
+
+    </div>
+</section>
+<section class="testimonials-section">
+    <div class="container">
+        <h2>People talk about us</h2>
+        <p class="subtitle">I get a kick out of turning complicated problems into beautifully simple and intuitive solutions. The process of collaborating on a project is what I love the most.</p>
+        
+        <div class="testimonial-carousel">
+            <div class="testimonial-card center-card" data-index="0">
+                <p>"A complete overhaul of the UI that leaves their team, where they need it the most. My previous process on the web was difficult to follow and I spent hours fixing the same errors on a daily basis."</p>
+                <p class="client-name">Jhon Alibandone</p>
+                <div class="rating">⭐⭐⭐⭐⭐</div>
+            </div>
+            
+            <div class="testimonial-card right-side" data-index="1">
+                <p>"I couldn't be happier with the final results, everything was delivered on time and it was satisfactory!"</p>
+                <p class="client-name">Sarah Connor</p>
+                <div class="rating">⭐⭐⭐⭐⭐</div>
+            </div>
+            
+            <div class="testimonial-card left-side" data-index="2">
+                <p>"Working with Daksh was exceptional. He understood the brand vision instantly and delivered clean, scalable design systems."</p>
+                <p class="client-name">Mike Ross</p>
+                <div class="rating">⭐⭐⭐⭐⭐</div>
+            </div>
+        </div>
+        
+        <div class="carousel-navigation">
+            <button class="nav-btn prev-btn"><i class="fas fa-chevron-left"></i></button>
+            <button class="nav-btn next-btn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+    </div>
+</section>
+<hr>
+<footer>
+    <div class="footer-cta">
+        <h3>Let’s make something amazing toghether.</h3>
+        <a href="mailto:dakshkumar4617@gmail.com" class="contact-footer-btn">Start a Project</a>
+    </div>
+    <div class="footer-info">
+        <div class="info-block">
+            <h4>Information</h4>
+            <p>Jager Molla Abdullpur Meerut | UP</p>
+        </div>
+        <div class="info-block">
+            <h4>Contact</h4>
+            <a href="mailto:dakshkumar4617@gmail.com">dakshkumar4617@gmail.com</a>
+            <p>+91 9528095030</p>
+        </div>
+        <div class="info-block">
+            <h4>Links</h4>
+            <a href="#services">Services</a>
+            <a href="#works">Works</a>
+            <a href="ep.html">Experience</a>
+        </div>
+       
+    </div>
+</footer>
+
+<script>
+    function setActiveTimeline(clickedItem, detailsId) {
+    // 1. Remove 'active' class from all timeline items
+    const allItems = document.querySelectorAll('.timeline-item');
+    allItems.forEach(item => {
+        item.classList.remove('active');
+    });
+
+    // 2. Add 'active' class to the clicked item
+    clickedItem.classList.add('active');
+
+    // 3. Hide all description boxes
+    const allDetails = document.querySelectorAll('.timeline-details');
+    allDetails.forEach(details => {
+        details.classList.add('hidden');
+    });
+
+    // 4. Show the corresponding description box
+    const targetDetails = document.getElementById(detailsId);
+    if (targetDetails) {
+        targetDetails.classList.remove('hidden');
+    }
+}
+
+// Set the initial state on load (optional, but good practice)
+document.addEventListener('DOMContentLoaded', () => {
+    // If the first item is active in HTML, ensure its details are shown
+    const firstDetails = document.getElementById('details-1');
+    if (firstDetails) {
+        firstDetails.classList.remove('hidden');
+    }
+
+    // You can add other scripts here if needed.
+});
+// --- Testimonial Carousel Logic ---
+const carouselCards = [
+    { name: "Jhon Alibandone", quote: "A complete overhaul of the UI that leaves their team, where they need it the most. My previous process on the web was difficult to follow and I spent hours fixing the same errors on a daily basis." },
+    { name: "Sarah Connor", quote: "I couldn't be happier with the final results, everything was delivered on time and it was satisfactory!" },
+    { name: "Mike Ross", quote: "Working with Daksh was exceptional. He understood the brand vision instantly and delivered clean, scalable design systems." }
+];
+
+let currentIndex = 0;
+
+function updateTestimonialCarousel(direction) {
+    const totalCards = carouselCards.length;
+    
+    // Update index based on direction
+    if (direction === 'next') {
+        currentIndex = (currentIndex + 1) % totalCards;
+    } else if (direction === 'prev') {
+        currentIndex = (currentIndex - 1 + totalCards) % totalCards;
+    }
+
+    const cards = document.querySelectorAll('.testimonial-card');
+    
+    // Loop through all physical cards in the DOM
+    for (let i = 0; i < totalCards; i++) {
+        let card = cards[i];
+        let classToAdd = 'hidden-card'; // Default to hidden
+        
+        // Calculate the card's position relative to the current index
+        // (i is the card's fixed data-index, currentIndex is the card that should be 'center')
+        let effectiveIndex = (i - currentIndex + totalCards) % totalCards;
+
+        // Map effective index to position
+        if (effectiveIndex === 0) {
+            classToAdd = 'center-card'; // Current item (Index 0 relative to currentIndex)
+        } else if (effectiveIndex === 1) {
+            classToAdd = 'right-side'; // Item immediately following (Index 1 relative)
+        } else if (effectiveIndex === totalCards - 1) {
+            classToAdd = 'left-side'; // Item immediately preceding (Index N-1 relative)
+        }
+        
+        // Remove existing position classes and add the new one
+        card.classList.remove('center-card', 'left-side', 'right-side', 'hidden-card');
+        card.classList.add(classToAdd);
+    }
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Existing timeline script is here...
+    
+    // Testimonial Navigation Setup
+    const nextBtn = document.querySelector('.next-btn');
+    const prevBtn = document.querySelector('.prev-btn');
+
+    if (nextBtn && prevBtn) {
+        nextBtn.addEventListener('click', () => updateTestimonialCarousel('next'));
+        prevBtn.addEventListener('click', () => updateTestimonialCarousel('prev'));
+        
+        // Initial setup
+        updateTestimonialCarousel(null); 
+    }
+});
+</script>
+</body>
+</html>
